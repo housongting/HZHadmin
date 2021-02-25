@@ -1,51 +1,58 @@
 <template>
-    <div class="loginIn">
-        <div class="loginDiv">
-            <h2 class="text-center">系统登录</h2>
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="mt-20">
+  <div class="loginIn">
+    <div class="loginDiv">
+      <h2 class="text-center">系统登录</h2>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="mt-20">
 
-                <el-form-item prop="username">
-                    <el-input placeholder="请输用户名" prefix-icon="el-icon-date" v-model="ruleForm.username"></el-input>
-                </el-form-item>
+        <el-form-item prop="account">
+          <el-input placeholder="请输用户名" prefix-icon="el-icon-date" v-model="ruleForm.account"></el-input>
+        </el-form-item>
 
-                <el-form-item prop="pass">
-                <el-input  placeholder="请输入密码" prefix-icon="el-icon-date" v-model="ruleForm.pass" show-password></el-input>
-                </el-form-item>
+        <el-form-item prop="password">
+          <el-input placeholder="请输入密码" prefix-icon="el-icon-date" v-model="ruleForm.password" show-password></el-input>
+        </el-form-item>
 
-                <el-button class="mt-20 btn" @click="btnsubmit('ruleForm')">登录</el-button>
-            </el-form>
-        </div>
+        <el-button class="mt-20 btn" @click="btnsubmit('ruleForm')">登录</el-button>
+      </el-form>
     </div>
+  </div>
 </template>
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       ruleForm: {
-        pass: "",
-        username: ""
+        password: "",
+        account: ""
       },
       rules: {
-        username: [
+        account: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 6, message: "长度在 3 到 6个字符", trigger: "blur" }
         ],
-        pass: [
+        password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 3, max: 6, message: "长度在 3 到 6个字符", trigger: "blur" }
         ]
       }
     };
   },
   methods: {
-    btnsubmit(formName) {
+    btnsubmit (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-           this.$router.push({path:"/home"})
+          this.axios.post('sell/users.php?a=login', 'account=' + this.ruleForm.account + '&password=' + this.ruleForm.password).then((res) => {
+            if (res.data.code == 0) {
+              //console.log(res);
+              sessionStorage.setItem('id', res.data.data.id)
+              sessionStorage.setItem('token', res.data.token)
+              sessionStorage.setItem('userInfo', JSON.stringify(res.data.data))
+              this.$router.push({ path: '/home' })
+            } else {
+              this.$message.error(res.data.msg);
+            }
+          })
         } else {
-          console.log("error submit!!");
-          return false;
+          return false
         }
       });
     }

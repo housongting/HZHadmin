@@ -6,7 +6,7 @@
           <img src="../assets/imgs/pic1.png" alt="">
           <h2 class="ml_5" style="color:#fff">外卖商家中心</h2>
         </div>
-        <el-menu default-active="/home" unique-opened router collapse-transition class="el-menu-vertical-demo" background-color="#304156" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu :default-active="this.$route.path" unique-opened router collapse-transition class="el-menu-vertical-demo" background-color="#304156" text-color="#fff" active-text-color="#ffd04b">
 
           <el-menu-item index="/home">
             <i class="el-icon-setting"></i>
@@ -67,8 +67,14 @@
             <span v-for="(item,index) in this.$route.meta" :key="index">/{{item}}</span>
           </div>
           <div class="flex align_center">
-            <span>欢迎你！小貂蝉</span>
-            <img class="ml_5" src="../assets/imgs/pic6.png" height="40" width="40" alt="">
+            <span>欢迎你！{{username}}</span>
+            <el-popover placement="bottom" width="80" trigger="click">
+              <div class="text item" style="text-align:center" @click="jump">管理员信息</div>
+              <el-divider></el-divider>
+              <div class="text item" style="text-align:center" @click="backAdmin">退出系统</div>
+              <el-avatar class="ml_5" slot="reference" small="medium" :src="imgUrl"></el-avatar>
+            </el-popover>
+
           </div>
         </div>
         <div class="contain">
@@ -83,17 +89,51 @@
 <script>
 export default {
   name: "Home",
-  data() {
+  data () {
     return {
-      firstTitle: "第一标题",
-      secondTitle: "第二标题"
+      username: '',
+      imgUrl: ''
     };
   },
-  components: {},
-  created() {
-    console.log(11)
+  components: {
+
   },
-  mounted() {}
+  created () {
+    var id = sessionStorage.getItem('id');
+    var token = sessionStorage.getItem('token');
+    var userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+    this.username = userInfo.account;
+    this.imgUrl = userInfo.imgUrl;
+    // console.log(userInfo);
+    // //验证登录状态-----没有登录token就切换到登录页面
+    this.axios.get('sell/users.php?a=chklogin', { params: { id, token } })
+      .then((res) => {
+        if (res.data.code == 0) {
+          console.log('登录成功')
+        } else {
+          this.$router.push({ path: '/' })
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    // this.axios.get('sell/users.php?a=chklogin&id=' + id + '&token=' + token)
+    //   .then((res) => {
+    //     console.log(res)
+    //   })
+
+  },
+  mounted () { },
+  methods: {
+    jump () {
+      this.$router.push({ path: '/home/admin_info' })
+    },
+    backAdmin () {
+      sessionStorage.clear();
+      this.$router.push({ path: '/' })
+    }
+  }
 };
 </script>
 

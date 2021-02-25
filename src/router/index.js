@@ -15,12 +15,10 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Home,
-    children: [
-      {
+    children: [{
         path: '/',
         name: 'home_index',
         component: () => import('../views/home_index.vue'),
-        meta: ['首页',]
       },
       {
         path: '/home/addZH',
@@ -69,6 +67,12 @@ const routes = [
         name: 'DDTJ',
         component: () => import('../views/DDTJ.vue'),
         meta: ['销售统计', '订单统计']
+      },
+      {
+        path: '/home/admin_info',
+        name: 'admin_info',
+        component: () => import('../views/admin_info.vue'),
+        meta: ["管理员信息"]
       },
     ]
   }, {
